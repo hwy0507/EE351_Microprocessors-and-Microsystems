@@ -1,136 +1,140 @@
-# 基于视觉导航的智能消防救援无人机系统
-本项目是一个集成了 **手势交互**、**ArUco 视觉定位**、**OCR 数字识别** 与 **自主飞行控制** 的综合系统。基于 Raspberry Pi 5 和 Picamera2 开发，旨在模拟火场环境下的无人化侦察任务。
+# Vision-Guided Intelligent Fire-Rescue UAV System
+
+This project is an integrated UAV system that combines **gesture interaction**, **ArUco-based visual localization**, **OCR digit recognition**, and **autonomous flight control**.  
+Built on Raspberry Pi 5 and Picamera2, it is designed to simulate unmanned reconnaissance tasks in fire-rescue scenarios.
 
 ---
 
-## 🌟 核心功能 (Key Features)
+## 🌟 Key Features
 
-1.  **高鲁棒性交互 (Robust Interaction)**
-    *   基于 MediaPipe 的手势识别。
-    *   引入**时序滑动窗口滤波**与**双重确认状态机**，防止误触。
-    *   支持“握拳全局重置”功能。
+1. **Robust Interaction**
+   - MediaPipe-based hand gesture recognition.
+   - Temporal sliding-window filtering and a double-confirmation state machine to reduce false triggers.
+   - Global reset with fist gesture.
 
-2.  **双模式作业 (Dual-Mode Operation)**
-    *   **模式 A (ArUco Mode)**：纯视觉跟随，锁定 ArUco 码进行姿态同步。
-    *   **模式 B (Digit Mode)**：智能数字侦察，寻找特定数字并拍照。
+2. **Dual-Mode Operation**
+   - **Mode A (ArUco Mode):** pure visual following using ArUco markers for pose synchronization.
+   - **Mode B (Digit Mode):** intelligent digit reconnaissance with target search and capture.
 
-3.  **自主闭环决策 (Autonomous Closed-Loop)**
-    *   **空间注意力机制**：通过 ArUco 门框定位 ROI 区域，屏蔽背景干扰。
-    *   **自愈式搜索**：若 OCR 识别结果与目标不符，无人机会自动切换至盲飞模式寻找下一个目标，直至任务完成。
+3. **Autonomous Closed-Loop Decision-Making**
+   - **Spatial attention mechanism:** uses ArUco gate detection to localize ROI and suppress background interference.
+   - **Self-recovery search:** if OCR result does not match the target, the UAV automatically switches back to search mode until the mission is completed.
 
 ---
 
-## 🎬 功能演示 (Demo Videos)
+## 🎬 Demo Videos
 
-为便于快速查看核心能力，这里提供两个功能演示视频：
-
-### 1) OCR 数字识别 (Digit Recognition)
+### 1) OCR Digit Recognition
 
 ![OCR Digit Recognition Demo](assets/gifs/recognition.gif)
 
-演示链接（GIF）：[recognition.gif](assets/gifs/recognition.gif)  
-原始视频（MP4）：[recognition.mp4](assets/videos/recognition.mp4)
+Demo link (GIF): [recognition.gif](assets/gifs/recognition.gif)  
+Original video (MP4): [recognition.mp4](assets/videos/recognition.mp4)
 
-### 2) ArUco 视觉跟随 (Visual Following)
+### 2) ArUco Visual Following
 
 ![ArUco Visual Following Demo](assets/gifs/following.gif)
 
-演示链接（GIF）：[following.gif](assets/gifs/following.gif)  
-原始视频（MP4）：[following.mp4](assets/videos/following.mp4)
+Demo link (GIF): [following.gif](assets/gifs/following.gif)  
+Original video (MP4): [following.mp4](assets/videos/following.mp4)
 
-> 如果网络较慢导致 GIF 加载较慢，可点击 MP4 链接查看原始视频。
+> If GIF loading is slow, use the MP4 links above.
 
 ---
 
-## 🛠️ 环境依赖 (Requirements)
+## 🛠️ Requirements
 
-请确保树莓派已连接 Picamera2 及飞控（通过 UART）。
+Make sure Raspberry Pi is connected to Picamera2 and the flight controller (UART).
 
 ```bash
-# 1. 激活虚拟环境
+# 1) Activate virtual environment
 source ~/rpi_env/bin/activate
 
-# 2. 安装依赖库
+# 2) Install dependencies
 pip install -r requirements.txt
 ```
 
-**关键库版本：**
-*   `opencv-python` (视觉处理)
-*   `mediapipe` (手势识别)
-*   `easyocr` (数字识别)
-*   `picamera2` (相机驱动)
-*   `torch` (深度学习后端)
+Key libraries:
+- `opencv-python` (vision processing)
+- `mediapipe` (gesture recognition)
+- `easyocr` (digit recognition)
+- `picamera2` (camera interface)
+- `torch` (deep-learning backend)
 
 ---
 
-## 🚀 快速开始 (Quick Start)
+## 🚀 Quick Start
 
-### 1. 启动系统
+### 1) Launch the system
+
 ```bash
 python vision_final.py
 ```
 
-### 2. 交互流程 (Phase 1)
-系统启动后，站在摄像头前进行手势控制：
+### 2) Interaction flow (Phase 1)
 
-| 目标模式           | 触发手势               | 确认操作       | 功能描述                                            |
-| :----------------- | :--------------------- | :------------- | :-------------------------------------------------- |
-| **ArUco 跟随模式** | **✊ 握拳 (Fist)**      | 保持握拳 1秒   | 调用 `aruco_dectction_pi5`，无人机跟随 ArUco 移动。 |
-| **数字侦察模式**   | **🖐️ 张开五指 (Hover)** | 再次张开五指   | 启动智能搜索闭环，寻找指定的数字门牌。              |
-| **全局重置**       | **✊ 握拳 (Fist)**      | (任意选择阶段) | 若选错数字或想取消，握拳可立即返回初始状态。        |
+After startup, stand in front of the camera and use hand gestures:
 
-> **数字选择细节**：进入数字模式后，伸出 **1, 2, 3 或 4** 根手指来选择目标数字，确认无误后再次张开五指 (Hover) 即可起飞。
+| Target Mode | Trigger Gesture | Confirmation | Description |
+| :-- | :-- | :-- | :-- |
+| **ArUco Following Mode** | **✊ Fist** | Hold for 1 second | Calls `aruco_dectction_pi5`; UAV follows the ArUco marker. |
+| **Digit Reconnaissance Mode** | **🖐️ Open Palm (Hover)** | Open palm again | Starts the intelligent closed-loop search for target digits. |
+| **Global Reset** | **✊ Fist** | Any phase | Immediately returns to the initial state. |
 
-### 3. 任务执行流程 (Phase 2 - 仅数字模式)
-一旦确认数字目标，无人机将自动执行以下闭环：
+> **Digit selection:** In Digit Mode, show **1, 2, 3, or 4** fingers to select the target number, then show open palm again to confirm and start.
 
-1.  **LOCK 搜索**：向右平飞 3 秒（寻找门框）。
-2.  **HOVER 检测**：悬停，等待画面出现完整的门框（4个 ArUco）。
-3.  **OCR 识别**：
-    *   ✅ **匹配成功**：打印日志，拍照保存至 `/home/pi/captured_images`，任务结束。
-    *   ❌ **匹配失败**：打印 "Mismatch"，自动切回 **LOCK 搜索** 状态，飞往下一个位置。
+### 3) Mission flow (Phase 2, Digit Mode only)
+
+Once the target digit is confirmed, the UAV runs the following closed loop:
+
+1. **LOCK Search:** flies right for 3 seconds to look for the gate.
+2. **HOVER Detection:** hovers and waits until a complete gate (4 ArUco markers) is detected.
+3. **OCR Recognition:**
+   - ✅ **Match:** logs success, captures a photo to `/home/pi/captured_images`, mission completed.
+   - ❌ **Mismatch:** logs "Mismatch", automatically switches back to **LOCK Search**.
 
 ---
 
-## 📂 文件结构说明 (File Structure)
+## 📂 File Structure
 
 ```text
 .
-├── vision_final.py          # [主程序] 集成了手势交互 + 智能搜索闭环 (推荐运行)
-├── test2.py                 # [测试脚本] 仅用于测试 OCR 算法逻辑 (无复杂手势)
-├── aruco_dectction_pi5.py   # [外部模块] 被主程序调用的 ArUco 纯跟随逻辑
-├── datalink_serial.py       # [驱动] 飞控通信接口 (MAVLink封装)
-├── biaoding.py              # 单目测距功能实现及摄像头畸变系数的标定
+├── vision_final.py          # Main program: gesture interaction + closed-loop search (recommended)
+├── test2.py                 # OCR logic test script (without complex gesture workflow)
+├── aruco_dectction_pi5.py   # External ArUco-following module called by the main program
+├── datalink_serial.py       # Flight-controller communication interface (MAVLink wrapper)
+├── biaoding.py              # Monocular ranging and camera distortion calibration
 ├── assets/
 │   ├── gifs/
-│   │   ├── recognition.gif  # OCR 数字识别演示动图
-│   │   └── following.gif    # ArUco 视觉跟随演示动图
+│   │   ├── recognition.gif  # OCR digit-recognition demo GIF
+│   │   └── following.gif    # ArUco visual-following demo GIF
 │   └── videos/
-│       ├── recognition.mp4  # OCR 数字识别演示
-│       └── following.mp4    # ArUco 视觉跟随演示
-├── requirements.txt         # 依赖列表
-└── readme.md                # 说明文档
+│       ├── recognition.mp4  # OCR digit-recognition demo video
+│       └── following.mp4    # ArUco visual-following demo video
+├── requirements.txt         # Dependency list
+└── readme.md                # Project documentation
 ```
 
 ---
 
-## ⚠️ 注意事项 (Safety & Notes)
+## ⚠️ Safety & Notes
 
-1.  **紧急停止 (Emergency Stop)**
-    *   运行过程中按键盘 **`s`** 键，程序会发送停止指令。
-    *   按 **`q`** 键退出程序。
+1. **Emergency stop**
+   - Press **`s`** during runtime to send stop commands.
+   - Press **`q`** to exit the program.
 
-2.  **相机冲突**
-    *   `vision_final.py` 在进入 ArUco 模式时会自动释放摄像头资源，以便外部脚本调用。请勿强行终止，否则可能导致相机资源被占用（需重启解决）。
+2. **Camera resource conflict**
+   - `vision_final.py` releases camera resources automatically when entering ArUco mode for external script calls.
+   - Do not force-kill the process, otherwise the camera may stay occupied (restart may be required).
 
-3.  **光照与环境**
-    *   OCR 识别对光照敏感，虽然加入了灰度化和自适应缩放，但强逆光仍可能影响识别率。
-    *   请确保 ArUco 门框尺寸约为实际环境中的 15cm-20cm 左右以获得最佳 ROI 提取效果。
+3. **Lighting and environment**
+   - OCR is sensitive to lighting. Grayscale preprocessing and adaptive scaling are included, but strong backlight can still degrade accuracy.
+   - Recommended ArUco gate size is around 15-20 cm in real scenes for better ROI extraction.
 
 ---
 
-## 📝 开发者信息
+## 📝 Project Info
 
-*   **项目名称**：微机原理与微系统期末项目 - 智能消防救援无人机
-*   **开发者**：胡伟毅12313505 && 姚瑞诣12312816
-*   **日期**：2026-1-3
+- **Project:** Final Project for Microprocessors and Microsystems - Intelligent Fire-Rescue UAV
+- **Developers:** Weiyi Hu (12313505) and Ruiyi Yao (12312816)
+- **Date:** 2026-01-03
