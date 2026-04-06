@@ -26,21 +26,19 @@
 
 ### 1) OCR 数字识别 (Digit Recognition)
 
-<video src="assets/videos/recognition.mp4" controls width="720">
-  Your browser does not support the video tag.
-</video>
+![OCR Digit Recognition Demo](assets/gifs/recognition.gif)
 
-演示链接（备用）：[recognition.mp4](assets/videos/recognition.mp4)
+演示链接（GIF）：[recognition.gif](assets/gifs/recognition.gif)  
+原始视频（MP4）：[recognition.mp4](assets/videos/recognition.mp4)
 
 ### 2) ArUco 视觉跟随 (Visual Following)
 
-<video src="assets/videos/following.mp4" controls width="720">
-  Your browser does not support the video tag.
-</video>
+![ArUco Visual Following Demo](assets/gifs/following.gif)
 
-演示链接（备用）：[following.mp4](assets/videos/following.mp4)
+演示链接（GIF）：[following.gif](assets/gifs/following.gif)  
+原始视频（MP4）：[following.mp4](assets/videos/following.mp4)
 
-> 若当前页面未直接预览视频，请点击链接在新标签页打开。
+> 如果网络较慢导致 GIF 加载较慢，可点击 MP4 链接查看原始视频。
 
 ---
 
@@ -104,6 +102,9 @@ python vision_final.py
 ├── datalink_serial.py       # [驱动] 飞控通信接口 (MAVLink封装)
 ├── biaoding.py              # 单目测距功能实现及摄像头畸变系数的标定
 ├── assets/
+│   ├── gifs/
+│   │   ├── recognition.gif  # OCR 数字识别演示动图
+│   │   └── following.gif    # ArUco 视觉跟随演示动图
 │   └── videos/
 │       ├── recognition.mp4  # OCR 数字识别演示
 │       └── following.mp4    # ArUco 视觉跟随演示
